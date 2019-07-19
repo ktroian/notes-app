@@ -1,0 +1,23 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="form">
+	<h3 class="form-title">Create Note</h3>
+	{% with messages = get_flashed_messages() %}
+        {% if messages %}
+            <div class="error">
+                {{ messages[0] }}
+            </div>
+        {% endif %}
+    {% endwith %}
+    <form method="POST" action="/notes/create">
+        <div class="input-wrapper">
+            <input class="input is-large" type="name" name="name" placeholder="New Note" autofocus="">
+        </div>
+        <div class="input-wrapper">
+            <textarea class="textarea is-medium" type="name" name="text" placeholder="Place your thoughts here" rows="10"></textarea>
+        </div>
+        <button class="button">Save</button>
+    </form>
+</div>
+{% endblock %}

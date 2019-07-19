@@ -1,0 +1,49 @@
+{% extends "base.html" %}
+
+{% block content %}
+	<div>
+		<head>
+	      <h1 class="form-title"> {{ username }}'s notes </h1>
+	    </head>
+	</div>
+    <body>
+    	<div class="grid">
+        {% for note in notes %}
+	    	<div class="grid-item">
+	        	<div class="note-name"><p>{{ note.name }}</p></div>
+	        	<div class="note-text"><p>{{ note.text }}</p></div>
+	            <form action="/notes/delete/{{ note.name }}" method="POST">
+	            	<img class="delete_icon" src="{{ url_for('static', filename='img/close.png') }}">
+	            </form>
+	            <form action="/notes/edit/{{ note.name }}" method="GET">
+		            <img class="edit_icon" src="{{ url_for('static', filename='img/edit.png') }}">
+	            </form>
+		    </div>
+        {% endfor %}
+        </div>
+        <script type="text/javascript">
+        	
+        	var editIcon = document.getElementsByClassName('edit_icon');
+        	var deleteIcon = document.getElementsByClassName('delete_icon');
+
+        	var editArr = Array.from(editIcon);
+        	var deleteArr = Array.from(deleteIcon);
+
+        	if (editArr && deleteArr)
+        	{
+        		editArr.forEach( function (editImg) {
+        			editImg.addEventListener('click', function() {
+        				this.parentNode.submit();
+        			});
+        		});
+
+        		deleteArr.forEach( function (deleteImg) {
+        			deleteImg.addEventListener('click', function() {
+        				this.parentNode.submit();
+        			});
+        		});
+        	}
+
+        </script>
+    </body>
+{% endblock %}

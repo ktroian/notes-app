@@ -1,0 +1,239 @@
+
+/* GLOBAL */
+
+body {
+	width: 60%;
+	margin: auto;
+}
+
+* {
+	font-family: 'Roboto Mono', monospace;
+}
+
+/* NAVBAR */
+
+nav {
+	margin-top: 20px;
+}
+
+.navbar-item {
+	text-decoration: none;
+	color: black;
+	text-transform: uppercase;
+	padding: 10px;
+}
+
+.navbar-item {
+  display: inline-block;
+  vertical-align: middle;
+  transform: perspective(1px) translateZ(0);
+  box-shadow: 0 0 1px rgba(0, 0, 0, 0);
+  position: relative;
+  overflow: hidden;
+}
+
+.navbar-item:before {
+  content: "";
+  position: absolute;
+  z-index: -1;
+  left: 0;
+  right: 100%;
+  bottom: 0;
+  background: black;
+  height: 2px;
+  transition-property: right;
+  transition-duration: 0.3s;
+  transition-timing-function: ease-out;
+}
+
+.navbar-item:hover:before, .navbar-item:focus:before, .navbar-item:active:before {
+  right: 0;
+}
+
+/* INDEX */
+
+.index {
+	text-align: center;
+	margin: 0;
+	display: flex;
+	justify-content: center;
+	align-items: center;
+	height: 100vh;
+}
+
+.flask {
+	width: 300px;
+	opacity: 0.2;
+	position: fixed;
+	z-index: -1000;
+}
+
+.fullwidth {
+	width: 100%;
+	display: block;
+}
+
+.title {
+	margin: 0px;
+	padding: 0px;
+	width: 100%;
+	text-align: center;
+	font-size: 7vh;
+	text-decoration: underline;
+}
+
+.subtitle {
+	margin: 0px;
+	padding: 0px;
+	width: 100%;
+	text-align: center;
+	font-size: 2vh;
+}
+
+/* SIGNUP || LOGIN */
+
+.error {
+	background-color: rgba(255, 0, 0, 0.3);
+	padding: 10px;
+}
+
+.form input, textarea {
+	border: none;
+	outline: none;
+	border-bottom: 1px solid black;
+}
+
+.input-wrapper {
+	margin: 20px 0px;
+}
+
+.form button {
+	background-color: white;
+	border: 1px solid black;
+	padding: 5px 15px;
+	transition: background-color, 1s;
+	cursor: pointer;
+}
+
+.form button:hover {
+	background-color: black;
+	color: white;
+}
+
+.form-title {
+	font-size: 10vh;
+	text-decoration: underline;
+}
+
+.checkbox {
+	margin-bottom: 10px;
+}
+
+.checkbox input[type="checkbox"] {
+    opacity: 0;
+}
+
+.checkbox label::before{
+    content: "";
+    display: inline-block;
+    
+    height: 16px;
+    width: 16px;
+    border: 1px solid;   
+}
+
+.checkbox label::after {
+    content: "";
+    display: inline-block;
+    height: 6px;
+    width: 9px;
+    border-left: 2px solid;
+    border-bottom: 2px solid;    
+    transform: rotate(-45deg);
+}
+
+.checkbox label {
+    position: relative;
+}
+
+.checkbox label::before,
+.checkbox label::after {
+    position: absolute;
+}
+
+.checkbox label::before {
+    top: 3px;
+    left: -25px;
+}
+
+.checkbox label::after {
+    left: -21px;
+    top: 7px;
+}
+
+.checkbox input[type="checkbox"] + label::after {
+    content: none;
+}
+
+.checkbox input[type="checkbox"]:checked + label::after {
+    content: "";
+}
+
+.checkbox input[type="checkbox"]:focus + label::before {
+    outline: rgb(59, 153, 252) auto 5px;
+}
+
+/* NOTES */
+
+.grid {
+	display: grid;
+	grid-template-columns: repeat(3, minmax(auto, 30%));
+	grid-gap: 15px;
+}
+
+.grid-item {
+	height: 30vh;
+	position: relative;
+	box-shadow: 5px 5px 10px;
+}
+
+.note-name {
+	font-weight: 900;
+	width: 100%;
+	background-color: black;
+	color: white;
+	height: 50px;
+	overflow: auto;
+}
+
+.note-name p {
+	margin: 0px 10px;
+	line-height: 50px;
+}
+
+.note-text p {
+	margin: 10px 10px;
+}
+
+.delete_icon, .edit_icon {
+	width: 5%;
+	position: absolute;
+	top: 10px;
+	right: 10px;
+	background-color: black;
+	cursor: pointer;
+}
+
+.grid-item form {
+	opacity: 0;
+	transition: opacity 1s;
+}
+
+.grid-item:hover > form {
+	opacity: 1;
+}
+
+.edit_icon {
+	right: 30px;
+}
+
