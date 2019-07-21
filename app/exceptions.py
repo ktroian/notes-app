@@ -1,3 +1,4 @@
+from jwt import ExpiredSignatureError, InvalidTokenError
 
 
 class InvalidModelError(Exception):
@@ -17,6 +18,10 @@ class IncorrectPasswordException(Exception):
 
 
 class IncorrectUsernameException(Exception):
+	pass
+
+
+class IncorrectEmailException(Exception):
 	pass
 
 

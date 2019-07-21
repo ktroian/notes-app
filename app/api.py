@@ -22,6 +22,7 @@ def authenticate(func):
             user = User.get(uid)
         except Exception as e:
             return fail(e)
+
         return func(*args, user, **kwargs)
     return wrapper
 
@@ -36,23 +37,21 @@ class RegisterAPI(Resource):
     def post(self):
         args = self.reqparse.parse_args()
         password = args.get('password')
+        username = args.get('username')
         try:
             user = User(
                 email=args.get('email'),
-                username=args.get('name'),
-                pswd_hash=generate_password_hash(password, method='sha256')
+                username=username,
+                password=password
             )
             user.create()
         except Exception as e:
-            resp = {
-                'status': 'fail',
-                'message': e
-            }
-            return jsonify(resp)
+            return fail(e)
 
+        auth_token = user.encode_token()
         resp = {
             'status': 'success',
-            'message': 'User %s registered.' % user.username,
+            'message': 'User %s registered.' % username,
             'auth_token': auth_token.decode()
         }
         return jsonify(resp)
@@ -70,13 +69,10 @@ class LoginAPI(Resource):
         password = args.get('password')
 
         try:
-            user = User.login(username, password)
+            user = User(username=username, password=password)
         except Exception as e:
-            resp = {
-                'status': 'fail',
-                'message': e
-            }
-            return jsonify(resp)
+            return fail(e)
+
         auth_token = user.encode_token()
         resp = {
             'status': 'success',
@@ -96,6 +92,7 @@ class NotesListAPI(Resource):
 
     def get(self, user):
         notes = Note.get_all(user.username)
+
         return {
             'notes': [marshal(note, note_fields) for note in notes]
         }
@@ -110,8 +107,10 @@ class NotesListAPI(Resource):
                 text=text,
                 author=user.username
             )
+            note.create()
         except Exception as e:
             return fail(e)
+
         return {
             'note': marshal(note.get(), note_fields)
         }
@@ -129,24 +128,35 @@ class NoteAPI(Resource):
 
     def get(self, user, id):
         author = user.username
-        note = Note(author=author, id=id)
+        try:
+            note = Note(author=author, id=id).get()
+        except Exception as e:
+            return fail(e)
+
         return {
-            'note': marshal(note.get(), note_fields)
+            'note': marshal(note, note_fields)
         }
 
     def put(self, user, id):
         args = self.reqparse.parse_args()
-        note = Note(author=user.username, id=id)
-        name = args.get('name')
-        text = args.get('text')
-        note.update(name=name, text=text)
+        try:
+            note = Note(author=user.username, id=id)
+            name = args.get('name')
+            text = args.get('text')
+            note.update(name=name, text=text)
+            note = note.get()
+        except Exception as e:
+            return fail(e)
         return {
-            'note': marshal(note.get(), note_fields)
+            'note': marshal(note, note_fields)
         }
 
     def delete(self, user, id):
-        note = Note(author=user.username, id=id)
-        note.delete()
+        try:
+            note = Note(author=user.username, id=id)
+            note.delete()
+        except Exception as e:
+            return fail(e)
         return {
             'result': True
         }

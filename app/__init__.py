@@ -34,6 +34,9 @@ app.register_blueprint(main_blueprint)
 from .api import api_routes as api_blueprint
 app.register_blueprint(api_blueprint)
 
+from .controls import controls
+app.register_blueprint(controls)
+
 from .models import User
 
 @login_manager.user_loader

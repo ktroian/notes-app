@@ -2,9 +2,12 @@ from werkzeug.security import check_password_hash, generate_password_hash
 from datetime import datetime, timedelta
 from flask_login import login_user
 from jwt import encode, decode
+from flask import Blueprint
 from .models import User as UserModel, Note as NoteModel
 from .exceptions import *
 from . import app, db, celery
+
+controls = Blueprint('controls', __name__)
 
 
 class User(object):
@@ -69,7 +72,7 @@ class User(object):
 
     @staticmethod
     def get(id):
-        ''' Returns user from database. '''
+        ''' Returns user instance from the database. '''
         user = User.model.query.filter_by(id=id).first()
         if not user:
             raise DoesNotExistException("User does not exist.")
@@ -123,11 +126,11 @@ class User(object):
             self.__email = True
 
     def __is_exist(self):
-        self.__exist = True
         entity = UserModel.query.filter_by(username=self.user.get('username')).first()
 
         if not entity:
             return False
+        self.__exist = True
         return True
 
     def __repr__(self):
@@ -153,12 +156,20 @@ class Note(object):
         ''' Returns JSON serialisable note dictionary.
             Data corresponds to the one from database.
         '''
+        name = self.note.get('name')
+
+        if not name:
+            raise DoesNotExistException('Note does not exist')
         return self.note
 
     @staticmethod
     def get_all(author):
         ''' Returns all notes from DataBase. '''
         return Note.model.query.filter_by(author=author).all()
+
+    def create(self):
+        ''' Starts Celery task. '''
+        TaskManager.create_note.delay(note=self.note)
 
     def update(self, **changes):
         ''' Starts Celery task that updates note data.'''
@@ -170,12 +181,9 @@ class Note(object):
         TaskManager.delete_note.delay(note=self.note)
     
     def __run_init(self):
-        self.__is_valid()
-
         if self.__is_exist():
             self.__fetch()
-        else:
-            self.__create()
+            self.__is_valid()
 
     def __fetch(self):
         ''' Fetches user data from DB with User instance
@@ -186,18 +194,24 @@ class Note(object):
         self.note['name'] = note.name
         self.note['text'] = note.text
 
-    def __create(self):
-        ''' Starts Celery task. '''
-        TaskManager.create_note.delay(note=self.note)
 
     def __is_valid(self):
         fields = self.note.keys()
+
+        if not 'id' in fields:
+            raise DoesNotExistException('Note does not exist')
+        elif not self.note['id']:
+            raise DoesNotExistException('Note does not exist')
 
         if not 'author' in fields:
             raise InvalidModelError('Note should have author.')
 
         if (not 'name' in fields) and (not 'id' in fields):
             raise InvalidModelError('Note should name or id author.')
+
+        if not self.note.get('name') and not self.note.get('id'):
+            raise InvalidModelError('Name not provided')
+
 
     def __is_exist(self):
         note = NoteModel.query.filter_by(**self.note).first()
@@ -208,7 +222,7 @@ class Note(object):
 
 
 class TaskManager(object):
-    ''' Class of Celery tasks. '''
+    '''Class of Celery tasks.'''
     @celery.task(name='app.controls.create_note')
     def create_note(note):
         # a workaround needed to have user specific ID for notes

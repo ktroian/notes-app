@@ -15,9 +15,7 @@ def index():
 def edit(name):
 	if request.method == 'GET':
 		author = current_user.username
-		print('GET')
 		note = Note(author=author, name=name)
-		print(note.note['id'])
 		return render_template('edit.html', note=note.get())
 	elif request.method == 'POST':
 		author = current_user.username
@@ -57,6 +55,7 @@ def create():
 			text=request.form.get('text'),
 			author=current_user.username
 		)
+		note.create()
 		return redirect(url_for('main.notes'))
 
 
